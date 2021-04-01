@@ -1,0 +1,17 @@
+{
+    "editor.defaultFormatter": "esbenp.prettier-vscode", // "dbaeumer.vscode-eslint",
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        // "source.fixAll.eslint": true
+        "source.fixAll": true
+    },
+    "eslint.alwaysShowStatus": true,
+    "eslint.validate": ["javascript", "typescript", "json", "jsonc"],
+    "markdownlint.ignore": [
+        "*.md"
+    ],
+    "cSpell.words": [
+        "nosources"
+    ]
+}
