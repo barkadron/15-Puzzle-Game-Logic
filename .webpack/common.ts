@@ -1,12 +1,23 @@
-const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CircularDependencyPlugin = require('circular-dependency-plugin');
-const PATHS = require('./paths');
+import path from 'path';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import CircularDependencyPlugin from 'circular-dependency-plugin';
 
-module.exports = {
+export const PATHS = {
+    src: path.resolve(__dirname, '..', 'src'),
+    build: path.resolve(__dirname, '..', 'build'),
+};
+
+export default {
     entry: {
         main: path.resolve(PATHS.src, 'index.ts'),
+    },
+    output: {
+        path: PATHS.build,
+        filename: '[name].bundle.js',
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js', '.json'],
     },
     module: {
         rules: [
@@ -30,13 +41,6 @@ module.exports = {
                 use: 'source-map-loader',
             },
         ],
-    },
-    resolve: {
-        extensions: ['.tsx', '.ts', '.js', '.json'],
-    },
-    output: {
-        path: PATHS.build,
-        filename: '[name].bundle.js',
     },
     plugins: [
         new CleanWebpackPlugin(),

@@ -1,7 +1,13 @@
-const { merge } = require('webpack-merge');
-const common = require('./common');
+import { mergeWithRules, CustomizeRule } from 'webpack-merge';
+import common from './common';
 
-module.exports = merge(common, {
+export default mergeWithRules({
+    module: {
+        rules: {
+            test: CustomizeRule.Merge,
+        },
+    },
+})(common, {
     mode: 'production',
     devtool: 'nosources-source-map',
     // output: {
