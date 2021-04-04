@@ -8,10 +8,5 @@
     },
     "eslint.alwaysShowStatus": true,
     "eslint.validate": ["javascript", "typescript", "json", "jsonc"],
-    "markdownlint.ignore": [
-        "*.md"
-    ],
-    "cSpell.words": [
-        "nosources"
-    ]
+    "markdownlint.ignore": ["*.md"]
 }
