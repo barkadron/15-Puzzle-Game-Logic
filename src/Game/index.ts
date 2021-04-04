@@ -1,146 +1,121 @@
-const _ = require('underscore');
+import _ from 'underscore';
 
-export enum SQUARE_SIZE {
+export enum GRID_SIZE {
     '3x3' = 3,
     '4x4' = 4,
     '5x5' = 5,
 }
 
-enum DIRECTION {
+export enum SLIDE_DIRECTION {
     LEFT = 'LEFT',
     RIGHT = 'RIGHT',
     UP = 'UP',
     DOWN = 'DOWN',
 }
 
-type MoveLimit = {
-    [key in DIRECTION]: number[];
+export type SlideLimit = {
+    [key in SLIDE_DIRECTION]: number[];
 };
 
-type Transitions = {
-    [key: number]: DIRECTION;
+export type Transition = {
+    [key in SLIDE_DIRECTION]: number | null;
+};
+
+export type SlideResult = {
+    emptyCellIndex: number;
+    transition: Transition;
 };
 
 export default class Game {
-    private scale: number;
+    private readonly scale: GRID_SIZE;
 
-    private square: number[];
+    private readonly grid: number[];
 
-    private moveLimit: MoveLimit;
+    private readonly slideLimit: SlideLimit;
 
-    private holeIndex: number;
+    private emptyCellIndex: number;
 
-    private transitions: Transitions;
+    private transition: Transition;
 
-    constructor(size: SQUARE_SIZE) {
-        if (!(Number.isInteger(size) && Object.values(SQUARE_SIZE).includes(size))) {
+    constructor(size: GRID_SIZE = GRID_SIZE['4x4']) {
+        if (!(Number.isInteger(size) && Object.values(GRID_SIZE).includes(size))) {
             throw new Error(`Ошибка! Передан некорректный размер поля '${size}', невозможно начать игру.`);
         }
 
         this.scale = size;
-        this.init();
-    }
 
-    private init = (): void => {
-        this.square = <number[]>_.shuffle(_.range(0, this.scale * this.scale, 1));
+        this.grid = _.shuffle(_.range(0, this.scale * this.scale, 1));
 
-        this.moveLimit = {
-            LEFT: _.range(0, this.scale * this.scale - 1, this.scale),
-            RIGHT: _.range(this.scale - 1, this.scale * this.scale, this.scale),
-            UP: _.range(0, this.scale, 1),
-            DOWN: _.range(this.scale * (this.scale - 1), this.scale * this.scale, 1),
+        this.slideLimit = {
+            [SLIDE_DIRECTION.LEFT]: _.range(0, this.scale * this.scale - 1, this.scale),
+            [SLIDE_DIRECTION.RIGHT]: _.range(this.scale - 1, this.scale * this.scale, this.scale),
+            [SLIDE_DIRECTION.UP]: _.range(0, this.scale, 1),
+            [SLIDE_DIRECTION.DOWN]: _.range(this.scale * (this.scale - 1), this.scale * this.scale, 1),
         };
 
-        this.holeIndex = this.findHole();
-        this.transitions = this.findTransitions();
-    };
+        this.emptyCellIndex = this.findEmptyCellIndex();
+        this.transition = this.findTransitions();
+    }
 
-    private findHole(): number {
-        let result = null;
-        for (let i = 0; i < this.square.length; i++) {
-            if (this.square[i] === 0) {
-                result = i;
-                break;
+    private findEmptyCellIndex(): number {
+        for (let i = 0; i < this.grid.length; i++) {
+            if (this.grid[i] === 0) {
+                return i;
             }
         }
 
-        if (result === null) {
-            throw new Error('Ошибка! Не удалось найти пустую ячейку на поле.');
-        }
+        throw new Error('Ошибка! Не удалось найти пустую ячейку на поле.');
+    }
 
+    private findTransitions(): Transition {
+        const result: Transition = {
+            [SLIDE_DIRECTION.RIGHT]: !this.slideLimit.LEFT.includes(this.emptyCellIndex) ? this.emptyCellIndex - 1 : null,
+            [SLIDE_DIRECTION.LEFT]: !this.slideLimit.RIGHT.includes(this.emptyCellIndex) ? this.emptyCellIndex + 1 : null,
+            [SLIDE_DIRECTION.DOWN]: !this.slideLimit.UP.includes(this.emptyCellIndex) ? this.emptyCellIndex - this.scale : null,
+            [SLIDE_DIRECTION.UP]: !this.slideLimit.DOWN.includes(this.emptyCellIndex) ? this.emptyCellIndex + this.scale : null,
+        };
         return result;
     }
 
-    private findTransitions(): Transitions {
-        const result: Transitions = {};
+    // public getEmptyCellRowNum(): number {
+    //     return Math.floor(this.emptyCellIndex / this.scale) + 1;
+    // }
 
-        if (!this.moveLimit.LEFT.includes(this.holeIndex)) {
-            const leftIndex = this.holeIndex - 1;
-            result[leftIndex] = DIRECTION.RIGHT;
-        }
-
-        if (!this.moveLimit.RIGHT.includes(this.holeIndex)) {
-            const rightIndex = this.holeIndex + 1;
-            result[rightIndex] = DIRECTION.LEFT;
-        }
-
-        if (!this.moveLimit.UP.includes(this.holeIndex)) {
-            const upIndex = this.holeIndex - this.scale;
-            result[upIndex] = DIRECTION.DOWN;
-        }
-
-        if (!this.moveLimit.DOWN.includes(this.holeIndex)) {
-            const downIndex = this.holeIndex + this.scale;
-            result[downIndex] = DIRECTION.UP;
-        }
-
-        return result;
-    }
-
-    // private getHoleRowNum(): number {
-    //     return Math.floor(this.holeIndex / this.scale) + 1;
+    // public getSlideLimit(): slideLimit {
+    //     return this.slideLimit;
     // }
 
     public getScale(): number {
         return this.scale;
     }
 
-    public getHoleIndex(): number {
-        return this.holeIndex;
+    public getGrid(): number[] {
+        return this.grid;
     }
 
-    public getTransitions(): Transitions {
-        return this.transitions;
+    public getEmptyCellIndex(): number {
+        return this.emptyCellIndex;
     }
 
-    public doStep(targetIndex: number): boolean {
-        const transition = this.transitions[targetIndex];
-        if (!transition) {
-            throw new Error(`Ошибка! Передан некорректный целевой индекс '${targetIndex}', невозможно сделать ход.`);
+    public getTransition(): Transition {
+        return this.transition;
+    }
+
+    public doSlide(direction: SLIDE_DIRECTION): { emptyCellIndex: number; transition: Transition } {
+        const targetIndex = this.transition[direction];
+        if (!(targetIndex != null && Number.isInteger(targetIndex) && targetIndex >= 0 && targetIndex < this.grid.length)) {
+            throw new Error(`Ошибка! Передано некорректное направление '${direction}', невозможно сделать ход.`);
         }
 
-        this.square[this.holeIndex] = this.square[targetIndex];
-        this.square[targetIndex] = 0;
-        this.holeIndex = targetIndex;
+        this.grid[this.emptyCellIndex] = this.grid[targetIndex];
+        this.grid[targetIndex] = 0;
+        this.emptyCellIndex = targetIndex;
 
-        this.transitions = this.findTransitions();
+        this.transition = this.findTransitions();
 
-        return true;
-    }
-
-    public printCurrentState(): void {
-        console.log('---------------------------');
-        let rowStart = 0;
-        let rowEnd = this.scale;
-        while (rowEnd <= this.square.length) {
-            console.log(this.square.slice(rowStart, rowEnd).join('\t\t'));
-            rowStart = rowEnd;
-            rowEnd += this.scale;
-        }
-        console.log('---------------------------');
-        console.log('Hole index: ', this.holeIndex);
-        // console.log('Hole row: ', this.getHoleRowNum());
-        // console.log('Limits: ', this.moveLimit);
-        console.log('Transitions: ', this.transitions, '\n');
+        return {
+            emptyCellIndex: this.emptyCellIndex,
+            transition: this.transition,
+        };
     }
 }
