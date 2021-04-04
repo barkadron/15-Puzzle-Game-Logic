@@ -1,26 +1,25 @@
 {
     "compilerOptions": {
-        "allowJs": true,
-        "checkJs": true,
-        "allowSyntheticDefaultImports": true,
-        "emitDecoratorMetadata": true,
-        "esModuleInterop": true,
-        "experimentalDecorators": true,
-        "importHelpers": true,
-        "noImplicitAny": true,
-        "removeComments": true,
-        "resolveJsonModule": true,
-        "sourceMap": true,
-        "baseUrl": "./",
-        "rootDir": "./",
-        "outDir": "build",
+        "strict": true,
         "target": "ES5",
-        "module": "es2020",
+        "module": "CommonJS",
         "moduleResolution": "node",
-        "typeRoots": ["node_modules/@types"],
-        "paths": {
-            "tslib": ["/node_modules/tslib/tslib.d.ts"]
-        }
-    },
-    "exclude": ["node_modules/**/*", "build/**/*"]
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "importHelpers": true,
+        "removeComments": true,
+        "sourceMap": true,
+        "outDir": "build"
+        // "baseUrl": "./",
+        // "rootDir": "./",
+        // "resolveJsonModule": true,
+        // "allowJs": true,
+        // "checkJs": true,
+        // "typeRoots": ["node_modules/@types"],
+        // "paths": {
+        //     "tslib": ["/node_modules/tslib/tslib.d.ts"]
+        // }
+    }
+    // "include": [".webpack/**/*"]
+    // "exclude": ["node_modules/**/*", "build/**/*"]
 }
