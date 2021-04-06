@@ -1,5 +1,7 @@
+import path from 'path';
 import { mergeWithRules, CustomizeRule } from 'webpack-merge';
-import common from './common';
+import TerserPlugin from 'terser-webpack-plugin';
+import common, { PATHS } from './common';
 
 export default mergeWithRules({
     module: {
@@ -9,19 +11,34 @@ export default mergeWithRules({
     },
 })(common, {
     mode: 'production',
-    devtool: 'nosources-source-map',
+    entry: {
+        main: path.resolve(PATHS.src, 'index.ts'),
+    },
+    // devtool: 'nosources-source-map',
     // output: {
     //     pathinfo: true,
     // },
     optimization: {
         minimize: true,
+        // prevent the creation of a LICENSE.txt
+        // https://github.com/webpack-contrib/terser-webpack-plugin/issues/229
+        minimizer: [
+            new TerserPlugin({
+                terserOptions: {
+                    format: {
+                        comments: false,
+                    },
+                },
+                extractComments: false,
+            }),
+        ],
         // minimizer: [new CssMinimizerPlugin(), '...'],
         // Once your build outputs multiple chunks, this option will ensure they share the webpack runtime
         // instead of having their own. This also helps with long-term caching, since the chunks will only
         // change when actual code changes, not the webpack runtime.
-        runtimeChunk: {
-            name: 'runtime',
-        },
+        // runtimeChunk: {
+        //     name: 'runtime',
+        // },
     },
     performance: {
         hints: false,

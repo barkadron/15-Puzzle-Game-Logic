@@ -1,70 +1,121 @@
-import Game, { GRID_SIZE, SLIDE_DIRECTION } from './Game';
+import _ from 'underscore';
 
-declare global {
-    interface Window {
-        slideLeft: () => void;
-        slideRight: () => void;
-        slideUp: () => void;
-        slideDown: () => void;
+export enum GRID_SIZE {
+    '3x3' = 3,
+    '4x4' = 4,
+    '5x5' = 5,
+}
+
+export enum SLIDE_DIRECTION {
+    LEFT = 'LEFT',
+    RIGHT = 'RIGHT',
+    UP = 'UP',
+    DOWN = 'DOWN',
+}
+
+export type SlideLimit = {
+    [key in SLIDE_DIRECTION]: number[];
+};
+
+export type Transition = {
+    [key in SLIDE_DIRECTION]: number | null;
+};
+
+export type SlideResult = {
+    emptyCellIndex: number;
+    transition: Transition;
+};
+
+export default class Game {
+    private readonly scale: GRID_SIZE;
+
+    private readonly grid: number[];
+
+    private readonly slideLimit: SlideLimit;
+
+    private emptyCellIndex: number;
+
+    private transition: Transition;
+
+    constructor(size: GRID_SIZE = GRID_SIZE['4x4']) {
+        if (!(Number.isInteger(size) && Object.values(GRID_SIZE).includes(size))) {
+            throw new Error(`Ошибка! Передан некорректный размер поля '${size}', невозможно начать игру.`);
+        }
+
+        this.scale = size;
+
+        this.grid = _.shuffle(_.range(0, this.scale * this.scale, 1));
+
+        this.slideLimit = {
+            [SLIDE_DIRECTION.LEFT]: _.range(0, this.scale * this.scale - 1, this.scale),
+            [SLIDE_DIRECTION.RIGHT]: _.range(this.scale - 1, this.scale * this.scale, this.scale),
+            [SLIDE_DIRECTION.UP]: _.range(0, this.scale, 1),
+            [SLIDE_DIRECTION.DOWN]: _.range(this.scale * (this.scale - 1), this.scale * this.scale, 1),
+        };
+
+        this.emptyCellIndex = this.findEmptyCellIndex();
+        this.transition = this.findTransitions();
     }
-}
 
-const game = new Game(GRID_SIZE['4x4']);
+    private findEmptyCellIndex(): number {
+        for (let i = 0; i < this.grid.length; i++) {
+            if (this.grid[i] === 0) {
+                return i;
+            }
+        }
 
-printCurrentState(game);
-
-// window.slideLeft = slideLeft;
-// window.slideRight = slideRight;
-// window.slideUp = slideUp;
-// window.slideDown = slideDown;
-
-document.addEventListener('keydown', (ev) => {
-    switch (ev.key) {
-        case 'ArrowLeft':
-            slideLeft();
-            break;
-        case 'ArrowRight':
-            slideRight();
-            break;
-        case 'ArrowUp':
-            slideUp();
-            break;
-        case 'ArrowDown':
-            slideDown();
-            break;
-        default:
-            break;
+        throw new Error('Ошибка! Не удалось найти пустую ячейку на поле.');
     }
-});
 
-function slideLeft() {
-    slide(SLIDE_DIRECTION.LEFT);
-}
-function slideRight() {
-    slide(SLIDE_DIRECTION.RIGHT);
-}
-function slideUp() {
-    slide(SLIDE_DIRECTION.UP);
-}
-function slideDown() {
-    slide(SLIDE_DIRECTION.DOWN);
-}
-
-function slide(direction: SLIDE_DIRECTION): void {
-    game.doSlide(direction);
-    printCurrentState(game);
-}
-
-function printCurrentState(g: Game): void {
-    console.log('-'.repeat(33));
-    let rowStart = 0;
-    let rowEnd = g.getScale();
-    while (rowEnd <= g.getGrid().length) {
-        console.log('|\t', g.getGrid().slice(rowStart, rowEnd).join('\t|\t'), '\t|\n');
-        console.log('-'.repeat(33));
-        rowStart = rowEnd;
-        rowEnd += g.getScale();
+    private findTransitions(): Transition {
+        const result: Transition = {
+            [SLIDE_DIRECTION.RIGHT]: !this.slideLimit.LEFT.includes(this.emptyCellIndex) ? this.emptyCellIndex - 1 : null,
+            [SLIDE_DIRECTION.LEFT]: !this.slideLimit.RIGHT.includes(this.emptyCellIndex) ? this.emptyCellIndex + 1 : null,
+            [SLIDE_DIRECTION.DOWN]: !this.slideLimit.UP.includes(this.emptyCellIndex) ? this.emptyCellIndex - this.scale : null,
+            [SLIDE_DIRECTION.UP]: !this.slideLimit.DOWN.includes(this.emptyCellIndex) ? this.emptyCellIndex + this.scale : null,
+        };
+        return result;
     }
-    console.debug('EmptyCell index: ', g.getEmptyCellIndex());
-    console.debug('Transition: ', g.getTransition(), '\n');
+
+    // public getEmptyCellRowNum(): number {
+    //     return Math.floor(this.emptyCellIndex / this.scale) + 1;
+    // }
+
+    // public getSlideLimit(): slideLimit {
+    //     return this.slideLimit;
+    // }
+
+    public getScale(): number {
+        return this.scale;
+    }
+
+    public getGrid(): number[] {
+        return this.grid;
+    }
+
+    public getEmptyCellIndex(): number {
+        return this.emptyCellIndex;
+    }
+
+    public getTransition(): Transition {
+        return this.transition;
+    }
+
+    public doSlide(direction: SLIDE_DIRECTION): { emptyCellIndex: number; transition: Transition } {
+        const targetIndex = this.transition[direction];
+        if (!(targetIndex != null && Number.isInteger(targetIndex) && targetIndex >= 0 && targetIndex < this.grid.length)) {
+            throw new Error(`Ошибка! Передано некорректное направление '${direction}', невозможно сделать ход.`);
+        }
+
+        this.grid[this.emptyCellIndex] = this.grid[targetIndex];
+        this.grid[targetIndex] = 0;
+        this.emptyCellIndex = targetIndex;
+
+        this.transition = this.findTransitions();
+
+        return {
+            emptyCellIndex: this.emptyCellIndex,
+            transition: this.transition,
+        };
+    }
 }

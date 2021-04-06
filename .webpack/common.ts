@@ -1,20 +1,18 @@
 import path from 'path';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
 import CircularDependencyPlugin from 'circular-dependency-plugin';
 
 export const PATHS = {
     src: path.resolve(__dirname, '..', 'src'),
     build: path.resolve(__dirname, '..', 'build'),
+    example: path.resolve(__dirname, '..', 'example'),
 };
 
 export default {
-    entry: {
-        main: path.resolve(PATHS.src, 'index.ts'),
-    },
     output: {
         path: PATHS.build,
-        filename: '[name].bundle.js',
+        // filename: '[name].bundle.js',
+        filename: 'index.js',
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.json'],
@@ -24,7 +22,13 @@ export default {
             {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
-                include: PATHS.src,
+                /**
+                 * FIX for:
+                 *  ERROR in ./example/index.ts 53:24
+                 *  Module parse failed: Unexpected token (53:24)
+                 *  You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders
+                 */
+                // include: PATHS.src,
                 exclude: /node_modules/,
             },
             {
@@ -44,11 +48,6 @@ export default {
     },
     plugins: [
         new CleanWebpackPlugin(),
-        new HtmlWebpackPlugin({
-            title: '15 Puzzle Game',
-            template: path.resolve(PATHS.src, 'template.html'),
-            filename: 'index.html',
-        }),
         new CircularDependencyPlugin({
             exclude: /node_modules/,
             failOnError: true,
