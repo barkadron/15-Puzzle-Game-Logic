@@ -1,4 +1,7 @@
-import _ from 'underscore';
+// https://tyapk.ru/blog/post/correct-way-to-import-lodash-methods
+// import range from 'underscore';
+import shuffle from 'lodash/shuffle';
+import range from 'lodash/range';
 
 export enum GRID_SIZE {
     '3x3' = 3,
@@ -44,13 +47,13 @@ export default class Game {
 
         this.scale = size;
 
-        this.grid = _.shuffle(_.range(0, this.scale * this.scale, 1));
+        this.grid = shuffle(range(0, this.scale * this.scale, 1));
 
         this.slideLimit = {
-            [SLIDE_DIRECTION.LEFT]: _.range(0, this.scale * this.scale - 1, this.scale),
-            [SLIDE_DIRECTION.RIGHT]: _.range(this.scale - 1, this.scale * this.scale, this.scale),
-            [SLIDE_DIRECTION.UP]: _.range(0, this.scale, 1),
-            [SLIDE_DIRECTION.DOWN]: _.range(this.scale * (this.scale - 1), this.scale * this.scale, 1),
+            [SLIDE_DIRECTION.LEFT]: range(0, this.scale * this.scale - 1, this.scale),
+            [SLIDE_DIRECTION.RIGHT]: range(this.scale - 1, this.scale * this.scale, this.scale),
+            [SLIDE_DIRECTION.UP]: range(0, this.scale, 1),
+            [SLIDE_DIRECTION.DOWN]: range(this.scale * (this.scale - 1), this.scale * this.scale, 1),
         };
 
         this.emptyCellIndex = this.findEmptyCellIndex();
