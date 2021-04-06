@@ -45,22 +45,24 @@ document.addEventListener('keydown', (ev) => {
     }
 });
 
-function slideLeft() {
+function slideLeft(): void {
     slide(SLIDE_DIRECTION.LEFT);
 }
-function slideRight() {
+function slideRight(): void {
     slide(SLIDE_DIRECTION.RIGHT);
 }
-function slideUp() {
+function slideUp(): void {
     slide(SLIDE_DIRECTION.UP);
 }
-function slideDown() {
+function slideDown(): void {
     slide(SLIDE_DIRECTION.DOWN);
 }
 
 function slide(direction: SLIDE_DIRECTION): void {
-    game.doSlide(direction);
-    printCurrentState(game);
+    if (game && game.doSlide) {
+        game.doSlide(direction);
+        printCurrentState(game);
+    }
 }
 
 function printCurrentState(g: Game): void {
