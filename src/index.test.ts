@@ -1,19 +1,46 @@
+import min from 'lodash/min';
+import max from 'lodash/max';
 import Game, { GRID_SIZE } from '.';
 
-test(`Create the Game with grid size '3x3'.`, () => {
-    const size = GRID_SIZE['3x3'];
-    const game = new Game(size);
-    expect(game).toBeInstanceOf(Game);
-});
+type SIZE = '3x3' | '4x4' | '5x5';
 
-test(`Create the Game with grid size '4x4'.`, () => {
-    const size = GRID_SIZE['4x4'];
-    const game = new Game(size);
-    expect(game).toBeInstanceOf(Game);
-});
+(<SIZE[]>['3x3', '4x4', '5x5']).forEach((gridSize) => {
+    // describe(`Game with grid size '3x3'.`, () => {
+    const scaleExp = parseInt(gridSize, 10);
 
-test(`Create the Game with grid size '5x5'.`, () => {
-    const size = GRID_SIZE['5x5'];
-    const game = new Game(size);
-    expect(game).toBeInstanceOf(Game);
+    const scale = GRID_SIZE[gridSize];
+    const game = new Game(scale);
+    const grid = game.getGrid();
+
+    test(`Grid size '${gridSize}' is equal to expected scale '${scaleExp}'.`, () => {
+        expect(scale).toEqual(scaleExp);
+    });
+
+    test(`Game created.`, () => {
+        expect(game).toBeInstanceOf(Game);
+    });
+
+    test(`Scale is equal expected scale.`, () => {
+        expect(game.getScale()).toEqual(scale);
+    });
+
+    test(`Grid has correct length.`, () => {
+        expect(Array.isArray(grid)).toBeTruthy();
+        expect(grid.length).toEqual(scale * scale);
+    });
+
+    test(`Grid has correct min val.`, () => {
+        expect(min(grid)).toEqual(0);
+    });
+
+    test(`Grid has correct max val.`, () => {
+        expect(max(grid)).toEqual(scale * scale - 1);
+    });
+
+    test(`Grid has correct empty cell index.`, () => {
+        const emptyCellIndex = game.getEmptyCellIndex();
+        expect(emptyCellIndex).toBeGreaterThanOrEqual(0);
+        expect(emptyCellIndex).toBeLessThanOrEqual(scale * scale - 1);
+    });
+    // });
 });
