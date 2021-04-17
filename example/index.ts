@@ -1,4 +1,4 @@
-import Game, { GRID_SIZE, SLIDE_DIRECTION } from '../src';
+import Game, { SLIDE_DIRECTION } from '../src';
 
 declare global {
     interface Window {
@@ -27,7 +27,7 @@ const keyMap: KeyMap = {
     [KEYS.ArrowDown]: slideDown,
 };
 
-const game = new Game(GRID_SIZE['4x4']);
+const game = new Game();
 
 printCurrentState(game);
 
