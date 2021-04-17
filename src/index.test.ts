@@ -54,7 +54,7 @@ function runTests(gridSize: string) {
             expect(emptyCellIndex).toBeLessThanOrEqual(scale * scale - 1);
         });
 
-        test(`Limits are correct`, () => {
+        test(`Limits are correct.`, () => {
             const limits: {
                 [key in GRID_SIZE]: SlideLimit;
             } = {
