@@ -1,5 +1,4 @@
 // https://tyapk.ru/blog/post/correct-way-to-import-lodash-methods
-// import range from 'underscore';
 import shuffle from 'lodash/shuffle';
 import range from 'lodash/range';
 import min from 'lodash/min';
@@ -31,12 +30,12 @@ export type SlideResult = {
     transition: Transition;
 };
 
-interface GameConfig {
+export type GameConfig = {
     size: GRID_SIZE;
     grid?: number[];
-}
+};
 
-const defaultGridSize = GRID_SIZE['4x4'];
+export const DEFAULT_GRID_SIZE = GRID_SIZE['4x4'];
 
 export default class Game {
     private readonly scale: GRID_SIZE;
@@ -52,33 +51,42 @@ export default class Game {
     constructor(config?: GameConfig) {
         const { size, grid } = config || {};
 
-        this.scale = size || defaultGridSize;
-        if (!(Number.isInteger(this.scale) && Object.values(GRID_SIZE).includes(this.scale))) {
+        this.scale = size || DEFAULT_GRID_SIZE;
+        if (!this.validateScale()) {
             throw new Error(`Ошибка! Передан некорректный размер игрового поля '${this.scale}', невозможно начать игру.`);
         }
 
-        this.grid = grid || generateArray(this.scale);
-        if (
-            !(
-                Array.isArray(this.grid) &&
-                this.grid.length === this.scale * this.scale &&
-                min(this.grid) === 0 &&
-                max(this.grid) === this.scale * this.scale - 1 &&
-                !this.grid.sort((a, b) => a - b).some((v, i) => v !== i)
-            )
-        ) {
+        this.grid = grid || shuffle(range(0, this.scale * this.scale, 1));
+        if (!this.validateGrid()) {
             throw new Error(`Ошибка! Передано некорректное игровое поле [${this.grid.join(',')}], невозможно начать игру.`);
         }
 
-        this.slideLimit = {
+        this.slideLimit = this.findLimits();
+        this.emptyCellIndex = this.findEmptyCellIndex();
+        this.transition = this.findTransitions();
+    }
+
+    private validateScale(): boolean {
+        return Number.isInteger(this.scale) && Object.values(GRID_SIZE).includes(this.scale);
+    }
+
+    private validateGrid(): boolean {
+        return (
+            Array.isArray(this.grid) &&
+            this.grid.length === this.scale * this.scale &&
+            min(this.grid) === 0 &&
+            max(this.grid) === this.scale * this.scale - 1 &&
+            !this.grid.sort((a, b) => a - b).some((v, i) => v !== i)
+        );
+    }
+
+    private findLimits(): SlideLimit {
+        return {
             [SLIDE_DIRECTION.LEFT]: range(0, this.scale * this.scale - 1, this.scale),
             [SLIDE_DIRECTION.RIGHT]: range(this.scale - 1, this.scale * this.scale, this.scale),
             [SLIDE_DIRECTION.UP]: range(0, this.scale, 1),
             [SLIDE_DIRECTION.DOWN]: range(this.scale * (this.scale - 1), this.scale * this.scale, 1),
         };
-
-        this.emptyCellIndex = this.findEmptyCellIndex();
-        this.transition = this.findTransitions();
     }
 
     private findEmptyCellIndex(): number {
@@ -92,21 +100,16 @@ export default class Game {
     }
 
     private findTransitions(): Transition {
-        const result: Transition = {
+        return {
             [SLIDE_DIRECTION.RIGHT]: !this.slideLimit.LEFT.includes(this.emptyCellIndex) ? this.emptyCellIndex - 1 : null,
             [SLIDE_DIRECTION.LEFT]: !this.slideLimit.RIGHT.includes(this.emptyCellIndex) ? this.emptyCellIndex + 1 : null,
             [SLIDE_DIRECTION.DOWN]: !this.slideLimit.UP.includes(this.emptyCellIndex) ? this.emptyCellIndex - this.scale : null,
             [SLIDE_DIRECTION.UP]: !this.slideLimit.DOWN.includes(this.emptyCellIndex) ? this.emptyCellIndex + this.scale : null,
         };
-        return result;
     }
 
     // public getEmptyCellRowNum(): number {
     //     return Math.floor(this.emptyCellIndex / this.scale) + 1;
-    // }
-
-    // public getSlideLimit(): slideLimit {
-    //     return this.slideLimit;
     // }
 
     public getScale(): number {
@@ -115,6 +118,10 @@ export default class Game {
 
     public getGrid(): number[] {
         return this.grid;
+    }
+
+    public getSlideLimit(): SlideLimit {
+        return this.slideLimit;
     }
 
     public getEmptyCellIndex(): number {
@@ -142,8 +149,4 @@ export default class Game {
             transition: this.transition,
         };
     }
-}
-
-function generateArray(scale: GRID_SIZE) {
-    return shuffle(range(0, scale * scale, 1));
 }
