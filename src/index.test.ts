@@ -11,10 +11,10 @@ describe(`Basic tests`, () => {
 
 const gridSizes = Object.keys(GRID_SIZE).filter((key) => !Number.isNaN(Number(GRID_SIZE[key as keyof typeof GRID_SIZE])));
 for (const gridSize of gridSizes) {
-    runTests(gridSize);
+    runUniversalTests(gridSize);
 }
 
-function runTests(gridSize: string) {
+function runUniversalTests(gridSize: string) {
     describe(`Game with grid size '${gridSize}'.`, () => {
         const scaleExp = parseInt(gridSize, 10);
 
