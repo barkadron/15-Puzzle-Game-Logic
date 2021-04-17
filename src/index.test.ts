@@ -2,10 +2,13 @@ import min from 'lodash/min';
 import max from 'lodash/max';
 import Game, { GRID_SIZE, SLIDE_DIRECTION, SlideLimit } from '.';
 
-Object.keys(GRID_SIZE)
-    .filter((key) => !Number.isNaN(Number(GRID_SIZE[key as keyof typeof GRID_SIZE])))
-    .forEach((gridSize) => {
-        // describe(`Game with grid size '3x3'.`, () => {
+const gridSizes = Object.keys(GRID_SIZE).filter((key) => !Number.isNaN(Number(GRID_SIZE[key as keyof typeof GRID_SIZE])));
+for (const gridSize of gridSizes) {
+    runTests(gridSize);
+}
+
+function runTests(gridSize: string) {
+    describe(`Game with grid size '${gridSize}'.`, () => {
         const scaleExp = parseInt(gridSize, 10);
 
         const scale = GRID_SIZE[gridSize as keyof typeof GRID_SIZE];
@@ -21,7 +24,7 @@ Object.keys(GRID_SIZE)
             expect(game).toBeInstanceOf(Game);
         });
 
-        test(`Scale is equal expected scale.`, () => {
+        test(`Scale is equal to expected scale.`, () => {
             expect(game.getScale()).toEqual(scale);
         });
 
@@ -44,23 +47,23 @@ Object.keys(GRID_SIZE)
             expect(emptyCellIndex).toBeLessThanOrEqual(scale * scale - 1);
         });
 
-        test(`Limits is correct`, () => {
+        test(`Limits are correct`, () => {
             const limits: {
                 [key in GRID_SIZE]: SlideLimit;
             } = {
-                '3': {
+                3: {
                     [SLIDE_DIRECTION.LEFT]: [0, 3, 6],
                     [SLIDE_DIRECTION.RIGHT]: [2, 5, 8],
                     [SLIDE_DIRECTION.UP]: [0, 1, 2],
                     [SLIDE_DIRECTION.DOWN]: [6, 7, 8],
                 },
-                '4': {
+                4: {
                     [SLIDE_DIRECTION.LEFT]: [0, 4, 8, 12],
                     [SLIDE_DIRECTION.RIGHT]: [3, 7, 11, 15],
                     [SLIDE_DIRECTION.UP]: [0, 1, 2, 3],
                     [SLIDE_DIRECTION.DOWN]: [12, 13, 14, 15],
                 },
-                '5': {
+                5: {
                     [SLIDE_DIRECTION.LEFT]: [0, 5, 10, 15, 20],
                     [SLIDE_DIRECTION.RIGHT]: [4, 9, 14, 19, 24],
                     [SLIDE_DIRECTION.UP]: [0, 1, 2, 3, 4],
@@ -70,5 +73,5 @@ Object.keys(GRID_SIZE)
 
             expect(limit).toStrictEqual<SlideLimit>(limits[scale]);
         });
-        // });
     });
+}
