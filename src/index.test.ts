@@ -2,6 +2,13 @@ import min from 'lodash/min';
 import max from 'lodash/max';
 import Game, { GRID_SIZE, SLIDE_DIRECTION, SlideLimit } from '.';
 
+describe(`Basic tests`, () => {
+    test(`Game created with default config.`, () => {
+        const game = new Game();
+        expect(game).toBeInstanceOf(Game);
+    });
+});
+
 const gridSizes = Object.keys(GRID_SIZE).filter((key) => !Number.isNaN(Number(GRID_SIZE[key as keyof typeof GRID_SIZE])));
 for (const gridSize of gridSizes) {
     runTests(gridSize);
