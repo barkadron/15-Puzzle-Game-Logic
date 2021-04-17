@@ -2,6 +2,8 @@
 // import range from 'underscore';
 import shuffle from 'lodash/shuffle';
 import range from 'lodash/range';
+import min from 'lodash/min';
+import max from 'lodash/max';
 
 export enum GRID_SIZE {
     '3x3' = 3,
@@ -29,6 +31,13 @@ export type SlideResult = {
     transition: Transition;
 };
 
+interface GameConfig {
+    size: GRID_SIZE;
+    grid?: number[];
+}
+
+const defaultGridSize = GRID_SIZE['4x4'];
+
 export default class Game {
     private readonly scale: GRID_SIZE;
 
@@ -40,14 +49,26 @@ export default class Game {
 
     private transition: Transition;
 
-    constructor(size: GRID_SIZE = GRID_SIZE['4x4']) {
-        if (!(Number.isInteger(size) && Object.values(GRID_SIZE).includes(size))) {
-            throw new Error(`Ошибка! Передан некорректный размер поля '${size}', невозможно начать игру.`);
+    constructor(config?: GameConfig) {
+        const { size, grid } = config || {};
+
+        this.scale = size || defaultGridSize;
+        if (!(Number.isInteger(this.scale) && Object.values(GRID_SIZE).includes(this.scale))) {
+            throw new Error(`Ошибка! Передан некорректный размер игрового поля '${this.scale}', невозможно начать игру.`);
         }
 
-        this.scale = size;
-
-        this.grid = shuffle(range(0, this.scale * this.scale, 1));
+        this.grid = grid || generateArray(this.scale);
+        if (
+            !(
+                Array.isArray(this.grid) &&
+                this.grid.length === this.scale * this.scale &&
+                min(this.grid) === 0 &&
+                max(this.grid) === this.scale * this.scale - 1 &&
+                !this.grid.sort((a, b) => a - b).some((v, i) => v !== i)
+            )
+        ) {
+            throw new Error(`Ошибка! Передано некорректное игровое поле [${this.grid.join(',')}], невозможно начать игру.`);
+        }
 
         this.slideLimit = {
             [SLIDE_DIRECTION.LEFT]: range(0, this.scale * this.scale - 1, this.scale),
@@ -121,4 +142,8 @@ export default class Game {
             transition: this.transition,
         };
     }
+}
+
+function generateArray(scale: GRID_SIZE) {
+    return shuffle(range(0, scale * scale, 1));
 }

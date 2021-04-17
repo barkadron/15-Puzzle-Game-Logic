@@ -9,7 +9,7 @@ type SIZE = '3x3' | '4x4' | '5x5';
     const scaleExp = parseInt(gridSize, 10);
 
     const scale = GRID_SIZE[gridSize];
-    const game = new Game(scale);
+    const game = new Game({ size: scale });
     const grid = game.getGrid();
 
     test(`Grid size '${gridSize}' is equal to expected scale '${scaleExp}'.`, () => {
