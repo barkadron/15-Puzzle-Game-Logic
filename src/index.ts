@@ -76,7 +76,10 @@ export default class Game {
             this.grid.length === this.scale * this.scale &&
             min(this.grid) === 0 &&
             max(this.grid) === this.scale * this.scale - 1 &&
-            !this.grid.sort((a, b) => a - b).some((v, i) => v !== i)
+            !this.grid
+                .slice()
+                .sort((a, b) => a - b)
+                .some((v, i) => v !== i)
         );
     }
 
