@@ -3,6 +3,7 @@ import shuffle from 'lodash/shuffle';
 import range from 'lodash/range';
 import min from 'lodash/min';
 import max from 'lodash/max';
+import isEqual from 'lodash/isEqual';
 
 export enum GRID_SIZE {
     '3x3' = 3,
@@ -79,7 +80,8 @@ export default class Game {
             !this.grid
                 .slice()
                 .sort((a, b) => a - b)
-                .some((v, i) => v !== i)
+                .some((v, i) => v !== i) &&
+            !isEqual(this.grid, this.grid.slice().sort())
         );
     }
 
