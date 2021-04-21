@@ -1,17 +1,22 @@
 {
-    "name": "15-puzzle-game",
+    "name": "15-puzzle-game-logic",
     "version": "1.0.0",
-    "description": "",
+    "description": "Logic for '15 Puzzle Game'.",
     "author": "Andrey Barkalov barkadron@mail.ru",
-    "license": "ISC",
+    "repository": "https://github.com/barkadron/15-Puzzle-Game-Logic.git",
+    "homepage": "https://github.com/barkadron/15-Puzzle-Game-Logic",
+    "license": "MIT",
+    "private": true,
     "main": "index.ts",
     "scripts": {
         "lint": "eslint --debug ./**/*.{ts,js,json}",
         "lint:write": "eslint --fix ./**/*.{ts,js,json}",
         "prettier": "prettier --write ./**/*.{ts,js,json}",
         "test": "jest",
+        "test:coverage": "jest --coverage",
         "build": "cross-env NODE_ENV=production webpack --config .webpack/prod.ts",
-        "start": "cross-env NODE_ENV=development webpack serve --config .webpack/dev.ts"
+        "start": "cross-env NODE_ENV=development webpack serve --config .webpack/dev.ts",
+        "prepare": "npm run lint && npm run test && npm run build"
     },
     "dependencies": {
         "lodash": "^4.17.21"

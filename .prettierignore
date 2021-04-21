@@ -1,5 +1,6 @@
 /.git
 /node_modules
 /build
+/coverage
 package-lock.json
 *.log

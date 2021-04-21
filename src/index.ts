@@ -1,4 +1,3 @@
-// https://tyapk.ru/blog/post/correct-way-to-import-lodash-methods
 import shuffle from 'lodash/shuffle';
 import range from 'lodash/range';
 import min from 'lodash/min';
@@ -54,12 +53,12 @@ export default class Game {
 
         this.scale = size || DEFAULT_GRID_SIZE;
         if (!this.validateScale()) {
-            throw new Error(`Ошибка! Передан некорректный размер игрового поля '${this.scale}', невозможно начать игру.`);
+            throw new Error(`Error! Wrong game board size passed: '${this.scale}'. Unable to start the game.`);
         }
 
         this.grid = grid || shuffle(range(0, this.scale * this.scale, 1));
         if (!this.validateGrid()) {
-            throw new Error(`Ошибка! Передано некорректное игровое поле [${this.grid.join(',')}], невозможно начать игру.`);
+            throw new Error(`Error! Wrong game board passed: [${this.grid.join(',')}]. Unable to start game.`);
         }
 
         this.slideLimit = this.findLimits();
@@ -101,7 +100,7 @@ export default class Game {
             }
         }
 
-        throw new Error('Ошибка! Не удалось найти пустую ячейку на поле.');
+        throw new Error('Error! Could not find an empty cell in the game board.');
     }
 
     private findTransitions(): Transition {
@@ -140,7 +139,7 @@ export default class Game {
     public doSlide(direction: SLIDE_DIRECTION): { emptyCellIndex: number; transition: Transition } {
         const targetIndex = this.transition[direction];
         if (!(targetIndex != null && Number.isInteger(targetIndex) && targetIndex >= 0 && targetIndex < this.grid.length)) {
-            throw new Error(`Ошибка! Передано некорректное направление '${direction}', невозможно сделать ход.`);
+            throw new Error(`Error! Wrong direction passed: '${direction}'. Unable to make a slide.`);
         }
 
         this.grid[this.emptyCellIndex] = this.grid[targetIndex];
