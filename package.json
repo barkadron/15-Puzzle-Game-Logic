@@ -3,10 +3,10 @@
     "version": "1.0.0",
     "description": "Logic for '15 Puzzle Game'.",
     "author": "Andrey Barkalov barkadron@mail.ru",
-    "repository": "https://github.com/barkadron/15-Puzzle-Game-Logic.git",
-    "homepage": "https://github.com/barkadron/15-Puzzle-Game-Logic",
+    "repository": "https://github.com/barkadron/15-puzzle-game-logic.git",
+    "homepage": "https://github.com/barkadron/15-puzzle-game-logic",
     "license": "MIT",
-    "private": true,
+    "private": false,
     "main": "build/index.js",
     "scripts": {
         "lint": "eslint --debug ./**/*.{ts,js,json}",
