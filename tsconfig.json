@@ -9,17 +9,10 @@
         "importHelpers": true,
         "removeComments": true,
         "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true,
         "outDir": "build"
-        // "baseUrl": "./",
-        // "rootDir": "./",
-        // "resolveJsonModule": true,
-        // "allowJs": true,
-        // "checkJs": true,
-        // "typeRoots": ["node_modules/@types"],
-        // "paths": {
-        //     "tslib": ["/node_modules/tslib/tslib.d.ts"]
-        // }
-    }
-    // "include": [".webpack/**/*"]
-    // "exclude": ["node_modules/**/*", "build/**/*"]
+    },
+    "include": ["src/**/*"],
+    "exclude": ["./**/*.test.ts"]
 }
