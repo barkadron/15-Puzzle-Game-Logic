@@ -136,7 +136,7 @@ export default class Game {
         return this.transition;
     }
 
-    public doSlide(direction: SLIDE_DIRECTION): { emptyCellIndex: number; transition: Transition } {
+    public doSlide(direction: SLIDE_DIRECTION): SlideResult {
         const targetIndex = this.transition[direction];
         if (!(targetIndex != null && Number.isInteger(targetIndex) && targetIndex >= 0 && targetIndex < this.grid.length)) {
             throw new Error(`Error! Wrong direction passed: '${direction}'. Unable to make a slide.`);
