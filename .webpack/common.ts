@@ -12,7 +12,7 @@ export default {
     output: {
         path: PATHS.build,
         filename: 'index.js',
-        libraryTarget: 'umd',
+        libraryTarget: 'umd', // https://stackoverflow.com/a/47263710
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.json'],
