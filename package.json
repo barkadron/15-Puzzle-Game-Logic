@@ -8,6 +8,10 @@
     "license": "MIT",
     "private": false,
     "main": "build/index.js",
+    "types": "build/index.d.ts",
+    "files": [
+        "/build"
+    ],
     "scripts": {
         "lint": "eslint --debug ./**/*.{ts,js,json}",
         "lint:write": "eslint --fix ./**/*.{ts,js,json}",

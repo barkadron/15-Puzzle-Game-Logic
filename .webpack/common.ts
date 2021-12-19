@@ -11,8 +11,8 @@ export const PATHS = {
 export default {
     output: {
         path: PATHS.build,
-        // filename: '[name].bundle.js',
         filename: 'index.js',
+        libraryTarget: 'umd',
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js', '.json'],
